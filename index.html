@@ -19,6 +19,7 @@
     --amber:#c9822c;
     --teal:#2f7a6e;
     --red:#b8523c;
+    --green:#3f7d4a;
     --font-sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
     --radius:14px;
   }
@@ -37,6 +38,7 @@
       --amber:#e3a34f;
       --teal:#5fb8a8;
       --red:#e08268;
+      --green:#7fc98a;
     }
   }
   :root[data-theme="dark"]{
@@ -53,6 +55,7 @@
     --amber:#e3a34f;
     --teal:#5fb8a8;
     --red:#e08268;
+    --green:#7fc98a;
   }
   *{box-sizing:border-box;}
   body{
@@ -113,6 +116,96 @@
     display:inline-flex;align-items:center;justify-content:center;
     font-size:13px;
   }
+
+  /* ---- 表單區 ---- */
+  .form-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+  }
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px 16px;
+    margin-bottom:14px;
+  }
+  .form-grid label, .form-card > label.full{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  .form-card input[type="text"],
+  .form-card input[type="password"],
+  .form-card textarea,
+  .form-card select{
+    font-family:inherit;
+    font-size:14px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--panel-raised);
+    color:var(--text);
+  }
+  .form-card textarea{resize:vertical;min-height:56px;}
+  .form-card > label.full{margin-bottom:14px;}
+
+  details.api-settings{
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:16px;
+    background:var(--bg-alt);
+  }
+  details.api-settings summary{
+    cursor:pointer;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--text-dim);
+  }
+  .api-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px 14px;
+    margin-top:12px;
+  }
+  .api-grid label.full{grid-column:1/-1;}
+  .api-note{font-size:12.5px;color:var(--text-faint);margin:10px 0 2px;}
+
+  .form-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .btn{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    padding:10px 18px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel-raised);
+    color:var(--text);
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--line-soft);}
+  .btn.primary{
+    background:var(--brown);
+    color:#fff9f0;
+    border-color:var(--brown);
+  }
+  .btn.primary:hover{opacity:.9;}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+
+  .gen-status{
+    margin-top:12px;
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:8px;
+    display:none;
+  }
+  .gen-status.show{display:block;}
+  .gen-status.status-ok{background:rgba(63,125,74,.12);color:var(--green);}
+  .gen-status.status-info{background:rgba(201,130,44,.12);color:var(--amber);}
+  .gen-status.status-err{background:rgba(184,82,60,.12);color:var(--red);}
 
   .week-grid{
     display:grid;
@@ -238,6 +331,41 @@
     <div class="brand-meta" id="brand-meta"></div>
   </header>
 
+  <section>
+    <h2><span class="num">0</span>設定你的品牌變數</h2>
+    <div class="form-card">
+      <div class="form-grid">
+        <label>品牌名稱<input type="text" id="f-name"></label>
+        <label>一句話標語<input type="text" id="f-tagline"></label>
+        <label>地點<input type="text" id="f-location"></label>
+        <label>目前階段<input type="text" id="f-stage" placeholder="例：剛開幕／週年慶"></label>
+        <label>經營型態<input type="text" id="f-team" placeholder="例：老闆一人經營，無專職小編"></label>
+        <label>目標客群<input type="text" id="f-audience"></label>
+        <label>客群備註<input type="text" id="f-audienceNote"></label>
+        <label>預算／資源備註<input type="text" id="f-budgetNote"></label>
+      </div>
+      <label class="full">給 AI 的補充描述（選填，僅 AI 生成時使用）
+        <textarea id="f-extra" placeholder="例如：主打單品豆特色、想強調的語氣、想避免的用詞…"></textarea>
+      </label>
+
+      <details class="api-settings">
+        <summary>AI 生成設定（選用，需自備 API 金鑰）</summary>
+        <div class="api-grid">
+          <label>服務商<select id="aiProvider"></select></label>
+          <label>模型<input type="text" id="aiModel" placeholder="模型名稱"></label>
+          <label class="full">API 金鑰<input type="password" id="aiKey" placeholder="貼上你的 API Key" autocomplete="off"></label>
+        </div>
+        <p class="api-note">金鑰只存在這台電腦的瀏覽器（localStorage），不會送到本工具以外的任何地方。留空時仍可按「產生」，會用範本套版方式把上面的品牌名稱換進既有計畫；填了金鑰則會請 AI 依你填的變數重新生成一份專屬的四週計畫。</p>
+      </details>
+
+      <div class="form-actions">
+        <button class="btn primary" id="generateBtn" type="button">產生我的四週計畫</button>
+        <button class="btn" id="resetBtn" type="button">重設為範例</button>
+      </div>
+      <div class="gen-status" id="genStatus"></div>
+    </div>
+  </section>
+
   <div class="consultant-note" id="consultant-note"></div>
 
   <section>
@@ -270,60 +398,378 @@
   </section>
 
   <footer>
-    製作：Mark Tsai｜<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a>｜內容資料集中於 data.js，替換品牌即可套用到其他店家
+    製作：Mark Tsai｜<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a>｜品牌變數與 AI 生成內容只存在你的瀏覽器
   </footer>
 
 </div>
 
-<script src="data.js?v=20260820"></script>
+<script src="data.js?v=20260820b"></script>
 <script>
 (function(){
-  var D = window.PLANNER_DATA;
-  var b = D.brand;
+  "use strict";
+  var TEMPLATE = window.PLANNER_TEMPLATE;
+  var BRAND_KEY = "coffeeIgPlannerBrand";
+  var CONTENT_KEY = "coffeeIgPlannerContent";
+  var API_STORAGE_KEY = "coffeeIgPlannerApiConfig";
+  var FIELD_KEYS = ["name","tagline","location","stage","team","audience","audienceNote","budgetNote"];
 
-  document.getElementById("brand-name").textContent = b.name;
-  document.getElementById("brand-tagline").textContent = b.tagline;
+  var state = { brand: null, content: null };
 
-  var metaEl = document.getElementById("brand-meta");
-  [b.location, b.stage, b.team, b.audience].forEach(function(txt){
-    var span = document.createElement("span");
-    span.textContent = txt;
-    metaEl.appendChild(span);
-  });
+  function $(id){ return document.getElementById(id); }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
 
-  document.getElementById("consultant-note").innerHTML =
-    "<b>顧問筆記：</b>" + b.consultantIntro;
+  /* ---------- 規則式套版 ---------- */
+  function applyBrandTokens(str, brand){
+    return str.split("{{BRAND}}").join(brand.name);
+  }
+  function buildConsultantIntro(brand){
+    return "我是你的品牌顧問。你們" + brand.stage + "、沒有任何社群帳號、" + brand.team +
+      "——這份規劃就是照這個現實條件排的：內容盡量用手機能拍、盡量幾個人就能做完，四週先把「這是一間怎樣的店」講清楚，再慢慢帶出專業感跟熟客感，不追求一夕爆紅。" +
+      brand.budgetNote;
+  }
+  function applyTemplate(template, brand){
+    return {
+      weeklyThemes: clone(template.weeklyThemes),
+      posts: template.posts.map(function(p){
+        return {
+          week: p.week, day: p.day, type: p.type, theme: p.theme,
+          copy: applyBrandTokens(p.copy, brand),
+          hashtags: p.hashtags.map(function(h){ return applyBrandTokens(h, brand); })
+        };
+      }),
+      consultantTips: clone(template.consultantTips),
+      consultantIntro: buildConsultantIntro(brand)
+    };
+  }
 
-  var weekGrid = document.getElementById("week-grid");
-  D.weeklyThemes.forEach(function(w){
-    var card = document.createElement("div");
-    card.className = "week-card";
-    card.innerHTML =
-      '<div class="w">第 ' + w.week + ' 週</div>' +
-      '<div class="t">' + w.title + '</div>' +
-      '<div class="g">' + w.goal + '</div>';
-    weekGrid.appendChild(card);
-  });
+  /* ---------- 表單 <-> state ---------- */
+  function fillFormFromBrand(brand){
+    FIELD_KEYS.forEach(function(k){ $("f-" + k).value = brand[k] || ""; });
+  }
+  function readBrandFromForm(){
+    var b = {};
+    FIELD_KEYS.forEach(function(k){ b[k] = $("f-" + k).value.trim() || TEMPLATE.defaultBrand[k]; });
+    return b;
+  }
+  function persistState(){
+    try{
+      localStorage.setItem(BRAND_KEY, JSON.stringify(state.brand));
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(state.content));
+    }catch(e){}
+  }
 
-  var rowsEl = document.getElementById("post-rows");
-  D.posts.forEach(function(p){
-    var tr = document.createElement("tr");
-    tr.innerHTML =
-      '<td><span class="week-badge">第 ' + p.week + ' 週</span></td>' +
-      '<td>' + p.day + '</td>' +
-      '<td><span class="type-badge type-' + p.type + '">' + p.type + '</span></td>' +
-      '<td class="theme-cell">' + p.theme + '</td>' +
-      '<td class="copy-cell">' + p.copy + '</td>' +
-      '<td class="hashtags">' + p.hashtags.join(" ") + '</td>';
-    rowsEl.appendChild(tr);
-  });
+  /* ---------- 渲染 ---------- */
+  function renderAll(brand, content){
+    $("brand-name").textContent = brand.name;
+    $("brand-tagline").textContent = brand.tagline;
 
-  var tipsEl = document.getElementById("tips-list");
-  D.consultantTips.forEach(function(tip){
-    var li = document.createElement("li");
-    li.textContent = tip;
-    tipsEl.appendChild(li);
-  });
+    var metaEl = $("brand-meta");
+    metaEl.innerHTML = "";
+    [brand.location, brand.stage, brand.team, brand.audience].forEach(function(txt){
+      var span = document.createElement("span");
+      span.textContent = txt;
+      metaEl.appendChild(span);
+    });
+
+    $("consultant-note").innerHTML = "<b>顧問筆記：</b>" + content.consultantIntro;
+
+    var weekGrid = $("week-grid");
+    weekGrid.innerHTML = "";
+    content.weeklyThemes.forEach(function(w){
+      var card = document.createElement("div");
+      card.className = "week-card";
+      card.innerHTML =
+        '<div class="w">第 ' + w.week + ' 週</div>' +
+        '<div class="t"></div>' +
+        '<div class="g"></div>';
+      card.querySelector(".t").textContent = w.title;
+      card.querySelector(".g").textContent = w.goal;
+      weekGrid.appendChild(card);
+    });
+
+    var rowsEl = $("post-rows");
+    rowsEl.innerHTML = "";
+    content.posts.forEach(function(p){
+      var tr = document.createElement("tr");
+      var typeClass = (p.type === "圖文" || p.type === "短影音" || p.type === "限動") ? p.type : "圖文";
+      tr.innerHTML =
+        '<td><span class="week-badge">第 ' + p.week + ' 週</span></td>' +
+        '<td class="day-cell"></td>' +
+        '<td><span class="type-badge type-' + typeClass + '"></span></td>' +
+        '<td class="theme-cell"></td>' +
+        '<td class="copy-cell"></td>' +
+        '<td class="hashtags"></td>';
+      tr.querySelector(".day-cell").textContent = p.day;
+      tr.querySelector(".type-badge").textContent = typeClass;
+      tr.querySelector(".theme-cell").textContent = p.theme;
+      tr.querySelector(".copy-cell").textContent = p.copy;
+      tr.querySelector(".hashtags").textContent = p.hashtags.join(" ");
+      rowsEl.appendChild(tr);
+    });
+
+    var tipsEl = $("tips-list");
+    tipsEl.innerHTML = "";
+    content.consultantTips.forEach(function(tip){
+      var li = document.createElement("li");
+      li.textContent = tip;
+      tipsEl.appendChild(li);
+    });
+  }
+
+  function showStatus(kind, msg){
+    var el = $("genStatus");
+    el.className = "gen-status show status-" + kind;
+    el.textContent = msg;
+  }
+
+  /* ---------- AI 引擎（比照 SocialPost/product-title-generator 既有模式） ---------- */
+  var AI_PROVIDERS = {
+    claude:     {label:"Claude（Anthropic）",       defaultModel:"claude-opus-4-8"},
+    openai:     {label:"OpenAI",                    defaultModel:"gpt-4o-mini"},
+    gemini:     {label:"Gemini（Google AI Studio）", defaultModel:"gemini-3.5-flash"},
+    openrouter: {label:"OpenRouter",                defaultModel:"openai/gpt-4o-mini"}
+  };
+
+  function loadApiConfig(){
+    try{ return JSON.parse(localStorage.getItem(API_STORAGE_KEY)) || {}; }catch(e){ return {}; }
+  }
+  function persistApiConfig(){
+    try{
+      localStorage.setItem(API_STORAGE_KEY, JSON.stringify({
+        provider: $("aiProvider").value,
+        model: $("aiModel").value.trim(),
+        apiKey: $("aiKey").value.trim()
+      }));
+    }catch(e){}
+  }
+  function initAiPanel(){
+    var sel = $("aiProvider");
+    sel.innerHTML = Object.keys(AI_PROVIDERS).map(function(k){
+      return '<option value="' + k + '">' + AI_PROVIDERS[k].label + '</option>';
+    }).join("");
+    var cfg = loadApiConfig();
+    sel.value = (cfg.provider && AI_PROVIDERS[cfg.provider]) ? cfg.provider : "claude";
+    $("aiModel").value = cfg.model || AI_PROVIDERS[sel.value].defaultModel;
+    $("aiKey").value = cfg.apiKey || "";
+    sel.addEventListener("change", function(){
+      var modelEl = $("aiModel");
+      var isDefault = Object.keys(AI_PROVIDERS).some(function(k){ return AI_PROVIDERS[k].defaultModel === modelEl.value.trim(); });
+      if(!modelEl.value.trim() || isDefault) modelEl.value = AI_PROVIDERS[sel.value].defaultModel;
+      persistApiConfig();
+    });
+    $("aiModel").addEventListener("input", persistApiConfig);
+    $("aiKey").addEventListener("input", persistApiConfig);
+  }
+
+  async function callLLM(provider, model, apiKey, prompt, onRetry){
+    var url, headers, body, extract;
+    if(provider === "claude"){
+      url = "https://api.anthropic.com/v1/messages";
+      headers = {"content-type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+      body = {model: model, max_tokens: 4000, messages: [{role:"user", content: prompt}]};
+      extract = function(d){
+        if(d.stop_reason === "refusal") throw new Error("模型拒絕了這個請求（refusal）");
+        var t = (d.content || []).filter(function(b){ return b.type === "text"; }).map(function(b){ return b.text; }).join("");
+        if(!t) throw new Error("回應中沒有文字內容");
+        return t;
+      };
+    } else if(provider === "openai"){
+      url = "https://api.openai.com/v1/chat/completions";
+      headers = {"content-type":"application/json","authorization":"Bearer " + apiKey};
+      body = {model: model, messages: [{role:"user", content: prompt}]};
+      extract = function(d){
+        var t = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content;
+        if(!t) throw new Error("回應中沒有文字內容");
+        return t;
+      };
+    } else if(provider === "gemini"){
+      url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
+      headers = {"content-type":"application/json","x-goog-api-key":apiKey};
+      body = {contents: [{parts: [{text: prompt}]}]};
+      extract = function(d){
+        var parts = (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || [];
+        var t = parts.map(function(p){ return p.text || ""; }).join("");
+        if(!t) throw new Error("回應中沒有文字內容");
+        return t;
+      };
+    } else if(provider === "openrouter"){
+      url = "https://openrouter.ai/api/v1/chat/completions";
+      headers = {"content-type":"application/json","authorization":"Bearer " + apiKey};
+      body = {model: model, messages: [{role:"user", content: prompt}]};
+      extract = function(d){
+        var t = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content;
+        if(!t) throw new Error("回應中沒有文字內容");
+        return t;
+      };
+    } else {
+      throw new Error("不支援的服務商");
+    }
+    var RETRYABLE = {429:1, 500:1, 503:1, 529:1};
+    var MAX_TRIES = 3;
+    for(var attempt = 1; attempt <= MAX_TRIES; attempt++){
+      var resp = await fetch(url, {method:"POST", headers:headers, body:JSON.stringify(body), signal: AbortSignal.timeout(180000)});
+      var raw = await resp.text();
+      if(resp.ok) return extract(JSON.parse(raw));
+      var msg = raw.slice(0, 300);
+      try{ var err = JSON.parse(raw); msg = (err.error && err.error.message) || err.message || msg; }catch(e){}
+      if(RETRYABLE[resp.status] && attempt < MAX_TRIES){
+        var waitSec = attempt * 8;
+        if(onRetry) onRetry(attempt, resp.status, waitSec);
+        await new Promise(function(r){ setTimeout(r, waitSec * 1000); });
+        continue;
+      }
+      if(resp.status === 404) msg += "——這通常表示模型名稱錯誤或已停用，請確認目前可用的模型 ID";
+      if(RETRYABLE[resp.status]) msg += "——已自動重試 " + (MAX_TRIES - 1) + " 次仍失敗，多為服務商暫時過載，請稍候再試或更換模型／服務商";
+      throw new Error("API 回應 " + resp.status + "：" + msg);
+    }
+  }
+
+  function parseJsonObject(text){
+    var cleaned = text.replace(/```json|```/g, "");
+    var start = cleaned.indexOf("{");
+    var end = cleaned.lastIndexOf("}");
+    if(start < 0 || end <= start) throw new Error("模型輸出中找不到 JSON 物件：" + text.slice(0, 120));
+    return JSON.parse(cleaned.slice(start, end + 1));
+  }
+
+  function buildPrompt(brand, extra){
+    var lines = [];
+    lines.push("你是一位擁有 10 年經驗的社群行銷顧問，熟悉台灣中小企業的品牌經營、Instagram 與 Facebook 內容操作。");
+    lines.push("請以「品牌顧問」的角色，站在客戶的立場，用可執行的具體建議規劃內容，不要空泛的行銷理論。");
+    lines.push("");
+    lines.push("客戶資訊：");
+    lines.push("- 品牌名稱：" + brand.name);
+    lines.push("- 一句話標語：" + brand.tagline);
+    lines.push("- 地點：" + brand.location);
+    lines.push("- 目前階段：" + brand.stage);
+    lines.push("- 經營型態：" + brand.team);
+    lines.push("- 目標客群：" + brand.audience + "（" + brand.audienceNote + "）");
+    lines.push("- 預算／資源限制：" + brand.budgetNote);
+    if(extra){ lines.push("- 補充描述：" + extra); }
+    lines.push("");
+    lines.push("請規劃一個月（4 週）的 Instagram 貼文主題與文案架構，每週至少 3 篇，並標註適合的貼文類型（圖文／短影音／限動）。");
+    lines.push("親切口語，像朋友聊天一樣自然，但保留專業判斷；避免生硬的行銷術語。");
+    lines.push("每篇文案字數不超過 100 字；每篇需附 3-5 個相關 hashtag 建議。");
+    lines.push("另外給 6 條給這位客戶的可執行建議（不是行銷理論），要針對「" + brand.budgetNote + "」這個限制。");
+    lines.push("");
+    lines.push('請只輸出一個 JSON 物件，不要 markdown 圍欄、不要任何其他文字，格式如下：');
+    lines.push('{"consultantIntro":"一段開場顧問筆記文字","weeklyThemes":[{"week":1,"title":"...","goal":"..."}],"posts":[{"week":1,"day":"週一","type":"圖文","theme":"...","copy":"...","hashtags":["#..."]}],"consultantTips":["..."]}');
+    lines.push("weeklyThemes 需剛好 4 筆（week 1-4）；posts 至少 12 篇，且每週至少 3 篇；type 只能是「圖文」「短影音」「限動」三選一；consultantTips 需 5-6 條。");
+    return lines.join("\n");
+  }
+
+  function validateAiContent(obj){
+    if(!obj || !Array.isArray(obj.weeklyThemes) || !Array.isArray(obj.posts) || !Array.isArray(obj.consultantTips)){
+      throw new Error("回傳內容缺少必要欄位");
+    }
+    if(obj.weeklyThemes.length !== 4) throw new Error("週主題數量不是 4 週");
+    if(obj.posts.length < 12) throw new Error("貼文數量不足 12 篇");
+
+    var perWeekCount = {1:0,2:0,3:0,4:0};
+    var VALID_TYPES = {"圖文":1,"短影音":1,"限動":1};
+    var posts = obj.posts.map(function(p){
+      var week = (p.week >= 1 && p.week <= 4) ? p.week : 1;
+      perWeekCount[week] = (perWeekCount[week] || 0) + 1;
+      var type = VALID_TYPES[p.type] ? p.type : "圖文";
+      var copy = String(p.copy || "").slice(0, 100);
+      var hashtags = Array.isArray(p.hashtags) ? p.hashtags.slice(0, 5) : [];
+      if(hashtags.length === 0) hashtags = ["#" + String(p.theme || "分享").slice(0, 10)];
+      return { week: week, day: String(p.day || ""), type: type, theme: String(p.theme || ""), copy: copy, hashtags: hashtags };
+    });
+    for(var w = 1; w <= 4; w++){
+      if((perWeekCount[w] || 0) < 3) throw new Error("第 " + w + " 週貼文數量不足 3 篇");
+    }
+    var weeklyThemes = obj.weeklyThemes.map(function(w){
+      return { week: w.week, title: String(w.title || ""), goal: String(w.goal || "") };
+    });
+    var consultantTips = obj.consultantTips.slice(0, 8).map(function(t){ return String(t); });
+    if(consultantTips.length < 3) throw new Error("顧問建議數量不足");
+
+    return {
+      consultantIntro: String(obj.consultantIntro || ""),
+      weeklyThemes: weeklyThemes,
+      posts: posts,
+      consultantTips: consultantTips
+    };
+  }
+
+  /* ---------- 產生 / 重設 ---------- */
+  async function onGenerateClick(){
+    var brand = readBrandFromForm();
+    state.brand = brand;
+
+    var apiKey = $("aiKey").value.trim();
+    var provider = $("aiProvider").value;
+    var model = $("aiModel").value.trim() || AI_PROVIDERS[provider].defaultModel;
+    var extra = $("f-extra").value.trim();
+
+    var btn = $("generateBtn");
+    btn.disabled = true;
+
+    if(!apiKey){
+      state.content = applyTemplate(TEMPLATE, brand);
+      renderAll(brand, state.content);
+      persistState();
+      showStatus("info", "未輸入 AI 金鑰，已用範本套版方式換上你的品牌名稱。");
+      btn.disabled = false;
+      return;
+    }
+
+    btn.textContent = "AI 生成中…";
+    showStatus("info", "正在請 AI 依你的品牌資訊生成專屬四週計畫，請稍候…");
+    try{
+      var prompt = buildPrompt(brand, extra);
+      var raw = await callLLM(provider, model, apiKey, prompt, function(attempt, status, waitSec){
+        showStatus("info", "服務商回應 " + status + "，第 " + attempt + " 次重試，等待 " + waitSec + " 秒…");
+      });
+      var parsed = parseJsonObject(raw);
+      var validated = validateAiContent(parsed);
+      state.content = validated;
+      renderAll(brand, state.content);
+      persistState();
+      showStatus("ok", "已用 AI 生成你的專屬四週計畫。");
+    }catch(err){
+      state.content = applyTemplate(TEMPLATE, brand);
+      renderAll(brand, state.content);
+      persistState();
+      showStatus("err", "AI 生成失敗（" + err.message + "），已改用範本套版方式套用你的品牌名稱。");
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "產生我的四週計畫";
+    }
+  }
+
+  function onResetClick(){
+    if(!confirm("要重設回預設範例「" + TEMPLATE.defaultBrand.name + "」嗎？目前填寫的品牌變數會被清除。")) return;
+    try{
+      localStorage.removeItem(BRAND_KEY);
+      localStorage.removeItem(CONTENT_KEY);
+    }catch(e){}
+    state.brand = clone(TEMPLATE.defaultBrand);
+    state.content = applyTemplate(TEMPLATE, state.brand);
+    fillFormFromBrand(state.brand);
+    renderAll(state.brand, state.content);
+    showStatus("info", "已重設為預設範例。");
+  }
+
+  /* ---------- 初始化 ---------- */
+  function init(){
+    var savedBrand = null, savedContent = null;
+    try{ savedBrand = JSON.parse(localStorage.getItem(BRAND_KEY)); }catch(e){}
+    try{ savedContent = JSON.parse(localStorage.getItem(CONTENT_KEY)); }catch(e){}
+
+    state.brand = savedBrand || clone(TEMPLATE.defaultBrand);
+    state.content = savedContent || applyTemplate(TEMPLATE, state.brand);
+
+    fillFormFromBrand(state.brand);
+    initAiPanel();
+    renderAll(state.brand, state.content);
+
+    $("generateBtn").addEventListener("click", onGenerateClick);
+    $("resetBtn").addEventListener("click", onResetClick);
+  }
+
+  init();
 })();
 </script>
 </body>
