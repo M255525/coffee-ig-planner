@@ -47,6 +47,8 @@
 
 比照 `SocialPost/index.html` 已驗證的共用實作：`MARQUEE_CHECK_URL` 是工作區多個工具共用的同一顆 Google Apps Script 端點，頁面載入時 POST 空 `serial`（本工具無序號機制，`doPost` 不論序號有效與否都會附上 `marquee` 陣列），只取回傳的 `marquee` 陣列（字串陣列）。先讀 `localStorage` 快取立即顯示，背景每 20 分鐘重抓一次；抓取失敗靜默忽略。獨立 `<script>` IIFE，跟主程式邏輯互不相依。**本頁沒有 `.topbar`／sticky header**，所以只需要 `body.has-marquee{padding-top:30px}`，不用像有 sticky topbar 的姊妹工具那樣額外調整 `.topbar{top:30px}`。改跑馬燈內容直接編輯共用 Google Sheet，不需要重新部署 Apps Script。
 
+**2026-08-20 更新（`Code.gs` 未改動、不需重新部署）**：`render()` 新增 `lastKey`（`JSON.stringify(items)`）比對，內容沒變就不重繪，CSS animation 不再被重置歸零重跑；新增 `appendParsedText()`／`buildTrackContent()` 支援 `[文字](https://...)` 連結語法（`createTextNode` 組 DOM，避免 XSS），資料格式仍是純字串陣列，向下相容。已 commit＋push（GitHub Pages 自動重新部署）。
+
 ## 操作手冊（manual.html）
 
 自成一頁、內嵌 `<style>`（沿用本頁的淺色暖色調變數，非 `Prompt/manual.html` 的深色主題）。內容涵蓋操作步驟／5 組快速範例說明／加入主畫面說明／隱私說明／使用警語／創作者資料／授權限制。**創作者資料區塊逐字比照** `Prompt/manual.html`／`SocialPost/manual.html`／`sbir-generator/manual.html`／`icap-generator/manual.html`／`phoenix-loan-generator/manual.html`，更新其中一邊時同步其餘各邊。`index.html` footer 的 `.footer-meta` 右側有連結 `manual.html`。
