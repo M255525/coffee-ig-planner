@@ -55,7 +55,7 @@
 
 ## 部署
 
-已推公開 GitHub repo：<https://github.com/M255525/coffee-ig-planner>，已用 `.github/workflows/deploy-pages.yml`（Actions 部署模式，比照 `workspace-git-repos` 記載的「不要用 legacy branch-source」慣例）啟用 GitHub Pages：<https://m255525.github.io/coffee-ig-planner/>。
+已推公開 GitHub repo：<https://github.com/M255525/coffee-ig-planner>，已用 `.github/workflows/deploy-pages.yml`（Actions 部署模式，比照 `workspace-git-repos` 記載的「不要用 legacy branch-source」慣例）啟用 GitHub Pages：<https://m255525.github.io/coffee-ig-planner/>。頁尾有訪客次數計數器（`visitor-badge.laobi.icu` 的 SVG badge，`page_id=m255525.coffeeigplanner`，免金鑰免後端，比照 `SocialPost`／`mrvideo_s` 既有慣例）。
 
 ## 指令
 
