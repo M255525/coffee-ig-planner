@@ -30,12 +30,18 @@
 - `coffeeIgPlannerContent` — 目前渲染中的內容（規則式或 AI 生成的結果都會存，reload 後還原，不會回到預設範例）。
 - `coffeeIgPlannerApiConfig` — `{provider, model, apiKey}`，金鑰只存本機瀏覽器，不經任何後端。
 - `coffeeIgPlannerMarquee` — 跑馬燈公告快取（見下方「頂部跑馬燈」）。
+- `coffeeIgPlannerSavedPlans` — 「已儲存的計畫」多筆具名清單，見下方「儲存與下載」。
 
 「重設為範例」按鈕會清掉前三個 key 並還原成 `defaultBrand`。
 
 ## 5 組快速範例
 
 `data.js` 的 `window.PLANNER_TEMPLATE.presets`（5 組）驅動表單上方的 `.example-btn` 藥丸按鈕（`initExamples()`）。**刻意全部維持在咖啡／飲品店這個大類**（不同經營型態與客群變化），因為規則式套版只替換 `{{BRAND}}` token、不改寫文案情境——如果範例跨到完全不同產業（例如瑜伽教室），沒填 AI 金鑰時套出來的貼文會文不對題。真正想做跨產業的內容，本來就該搭配 AI 生成（表單本身沒有產業限制）。每組 preset 除了 8 個品牌欄位，還有一個 `extra` 欄位（只在 AI 生成時使用，寫入 `#f-extra`）。
+
+## 儲存與下載
+
+- **已儲存的計畫**（`.saved-plans` 區塊，`initSavedPlans()`）：多筆具名清單，存 `coffeeIgPlannerSavedPlans`（`{id,name,savedAt,brand,content,extra}[]`）。按「💾 儲存目前計畫」存一筆（同名會詢問覆蓋）；清單用 `#savedList` 單一事件委派（`data-action="load|download|rename|delete"`）處理，DOM 一律用 `createElement`/`textContent` 組出（不用字串拼接 `innerHTML`，避免使用者輸入的名稱或 AI 生成內容裡若含 `<`/`>` 造成注入）。跟現有的單筆自動存檔（`coffeeIgPlannerBrand`/`Content`）是兩套獨立機制，互不影響。
+- **下載目前計畫**（`#downloadBtn` → `onDownloadClick()`）：`buildTextReport(brand, content)` 把品牌資訊／顧問筆記／四週主題／完整貼文列表／顧問建議組成一份純文字報告，`downloadText()` 用 `Blob` + 隱藏 `<a download>` 觸發瀏覽器下載（不經任何伺服器）。清單裡每一筆的「下載」按鈕呼叫同一組函式，直接用該筆存的 `brand`/`content`，不需要先載入才能下載。檔名經 `sanitizeFilename()` 去除 `\/:*?"<>|`。
 
 ## 頂部跑馬燈
 

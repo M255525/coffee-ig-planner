@@ -236,6 +236,26 @@
   .gen-status.status-info{background:rgba(201,130,44,.12);color:var(--amber);}
   .gen-status.status-err{background:rgba(184,82,60,.12);color:var(--red);}
 
+  .saved-plans{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);}
+  .saved-plans h3{font-size:15px;margin:0 0 10px;color:var(--text);}
+  .save-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .save-row input{flex:1;min-width:160px;}
+  .saved-list{list-style:none;padding:0;margin:0;display:grid;gap:8px;}
+  .saved-empty{color:var(--text-faint);font-size:13px;}
+  .saved-item{
+    display:flex;flex-wrap:wrap;gap:8px;
+    align-items:center;justify-content:space-between;
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 12px;
+  }
+  .saved-info{display:flex;flex-direction:column;gap:2px;}
+  .saved-name{font-size:13.5px;font-weight:700;color:var(--text);}
+  .saved-date{font-size:11.5px;color:var(--text-faint);}
+  .saved-actions{display:flex;flex-wrap:wrap;gap:6px;}
+  .saved-actions .btn{padding:5px 10px;font-size:12px;}
+
   .week-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
@@ -429,8 +449,18 @@
       <div class="form-actions">
         <button class="btn primary" id="generateBtn" type="button">產生我的四週計畫</button>
         <button class="btn" id="resetBtn" type="button">重設為範例</button>
+        <button class="btn" id="downloadBtn" type="button">📄 下載目前計畫（.txt）</button>
       </div>
       <div class="gen-status" id="genStatus"></div>
+
+      <div class="saved-plans">
+        <h3>已儲存的計畫</h3>
+        <div class="save-row">
+          <input type="text" id="saveName" placeholder="輸入名稱（留白會用品牌名稱）">
+          <button type="button" class="btn" id="saveBtn">💾 儲存目前計畫</button>
+        </div>
+        <ul class="saved-list" id="savedList"></ul>
+      </div>
     </div>
   </section>
 
@@ -533,6 +563,178 @@
       localStorage.setItem(BRAND_KEY, JSON.stringify(state.brand));
       localStorage.setItem(CONTENT_KEY, JSON.stringify(state.content));
     }catch(e){}
+  }
+
+  /* ---------- 下載 .txt 報告 ---------- */
+  function sanitizeFilename(s){
+    return s.replace(/[\\/:*?"<>|]/g, "").trim() || "社群內容規劃";
+  }
+  function buildTextReport(brand, content){
+    var lines = [];
+    lines.push(brand.name + "｜社群內容規劃報告");
+    lines.push(brand.tagline);
+    lines.push("");
+    lines.push("【品牌資訊】");
+    lines.push("地點：" + brand.location);
+    lines.push("目前階段：" + brand.stage);
+    lines.push("經營型態：" + brand.team);
+    lines.push("目標客群：" + brand.audience + "（" + brand.audienceNote + "）");
+    lines.push("預算／資源備註：" + brand.budgetNote);
+    lines.push("");
+    lines.push("【顧問筆記】");
+    lines.push(content.consultantIntro);
+    lines.push("");
+    lines.push("【四週主題總覽】");
+    content.weeklyThemes.forEach(function(w){
+      lines.push("第 " + w.week + " 週：" + w.title);
+      lines.push("　目標：" + w.goal);
+    });
+    lines.push("");
+    lines.push("【貼文計畫表】");
+    content.posts.forEach(function(p){
+      lines.push("----------------------------------------");
+      lines.push("第 " + p.week + " 週・" + p.day + "・" + p.type + "・" + p.theme);
+      lines.push(p.copy);
+      lines.push(p.hashtags.join(" "));
+    });
+    lines.push("----------------------------------------");
+    lines.push("");
+    lines.push("【顧問的可執行建議】");
+    content.consultantTips.forEach(function(t, i){
+      lines.push((i + 1) + ". " + t);
+    });
+    lines.push("");
+    lines.push("——由「社群內容規劃報告產生器」產生，僅供教學與個人參考，實際發布前請自行查證與調整。");
+    return lines.join("\n");
+  }
+  function downloadText(filename, text){
+    var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  function onDownloadClick(){
+    var filename = sanitizeFilename(state.brand.name) + "-社群內容規劃.txt";
+    downloadText(filename, buildTextReport(state.brand, state.content));
+    showStatus("ok", "已下載「" + filename + "」。");
+  }
+
+  /* ---------- 已儲存的計畫（多筆具名清單） ---------- */
+  var SAVED_KEY = "coffeeIgPlannerSavedPlans";
+  function loadSavedPlans(){
+    try{ return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; }catch(e){ return []; }
+  }
+  function persistSavedPlans(list){
+    try{ localStorage.setItem(SAVED_KEY, JSON.stringify(list)); }catch(e){}
+  }
+  function renderSavedList(){
+    var list = loadSavedPlans();
+    var el = $("savedList");
+    el.innerHTML = "";
+    if(!list.length){
+      var empty = document.createElement("li");
+      empty.className = "saved-empty";
+      empty.textContent = "還沒有儲存任何計畫";
+      el.appendChild(empty);
+      return;
+    }
+    list.forEach(function(item){
+      var li = document.createElement("li");
+      li.className = "saved-item";
+      li.dataset.id = item.id;
+
+      var info = document.createElement("div");
+      info.className = "saved-info";
+      var nameEl = document.createElement("span");
+      nameEl.className = "saved-name";
+      nameEl.textContent = item.name;
+      var dateEl = document.createElement("span");
+      dateEl.className = "saved-date";
+      dateEl.textContent = item.savedAt;
+      info.appendChild(nameEl);
+      info.appendChild(dateEl);
+
+      var actions = document.createElement("div");
+      actions.className = "saved-actions";
+      [["load", "載入"], ["download", "下載"], ["rename", "重新命名"], ["delete", "刪除"]].forEach(function(pair){
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn";
+        btn.dataset.action = pair[0];
+        btn.textContent = pair[1];
+        actions.appendChild(btn);
+      });
+
+      li.appendChild(info);
+      li.appendChild(actions);
+      el.appendChild(li);
+    });
+  }
+  function onSaveClick(){
+    var name = $("saveName").value.trim() || state.brand.name;
+    var list = loadSavedPlans();
+    var existingIdx = list.findIndex(function(x){ return x.name === name; });
+    if(existingIdx >= 0 && !confirm("已有同名紀錄「" + name + "」，要覆蓋嗎？")) return;
+    var item = {
+      id: existingIdx >= 0 ? list[existingIdx].id : String(Date.now()),
+      name: name,
+      savedAt: new Date().toLocaleString("zh-TW", {hour12: false}),
+      brand: clone(state.brand),
+      content: clone(state.content),
+      extra: $("f-extra").value.trim()
+    };
+    if(existingIdx >= 0) list[existingIdx] = item; else list.push(item);
+    persistSavedPlans(list);
+    renderSavedList();
+    $("saveName").value = "";
+    showStatus("ok", "已儲存「" + name + "」。");
+  }
+  function initSavedPlans(){
+    renderSavedList();
+    $("saveBtn").addEventListener("click", onSaveClick);
+    $("savedList").addEventListener("click", function(e){
+      var btn = e.target.closest("button[data-action]");
+      if(!btn) return;
+      var li = e.target.closest(".saved-item");
+      if(!li) return;
+      var list = loadSavedPlans();
+      var idx = list.findIndex(function(x){ return x.id === li.dataset.id; });
+      if(idx < 0) return;
+      var item = list[idx];
+      var action = btn.dataset.action;
+
+      if(action === "load"){
+        if(!confirm("載入「" + item.name + "」會覆蓋目前表單與畫面內容，確定嗎？")) return;
+        state.brand = clone(item.brand);
+        state.content = clone(item.content);
+        fillFormFromBrand(state.brand);
+        $("f-extra").value = item.extra || "";
+        renderAll(state.brand, state.content);
+        persistState();
+        showStatus("info", "已載入「" + item.name + "」。");
+      } else if(action === "download"){
+        downloadText(sanitizeFilename(item.name) + ".txt", buildTextReport(item.brand, item.content));
+        showStatus("ok", "已下載「" + item.name + "」。");
+      } else if(action === "rename"){
+        var newName = prompt("重新命名為：", item.name);
+        if(newName === null) return;
+        newName = newName.trim();
+        if(!newName) return;
+        item.name = newName;
+        persistSavedPlans(list);
+        renderSavedList();
+      } else if(action === "delete"){
+        if(!confirm("確定要刪除「" + item.name + "」嗎？此動作無法復原。")) return;
+        list.splice(idx, 1);
+        persistSavedPlans(list);
+        renderSavedList();
+      }
+    });
   }
 
   /* ---------- 快速範例 ---------- */
@@ -863,10 +1065,12 @@
     fillFormFromBrand(state.brand);
     initAiPanel();
     initExamples();
+    initSavedPlans();
     renderAll(state.brand, state.content);
 
     $("generateBtn").addEventListener("click", onGenerateClick);
     $("resetBtn").addEventListener("click", onResetClick);
+    $("downloadBtn").addEventListener("click", onDownloadClick);
   }
 
   init();
