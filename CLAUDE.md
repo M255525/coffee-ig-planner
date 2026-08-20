@@ -4,7 +4,7 @@
 
 ## 這是什麼
 
-IG 內容規劃報告產生器。以「品牌顧問」角色，依使用者在頁面上填的品牌變數，產生一個月（4 週、至少 12 篇）的 Instagram 貼文規劃。**單檔前端，無後端、無序號授權**。預設示範品牌為虛構的「晨光手沖咖啡」。
+社群內容規劃報告產生器。以「品牌顧問」角色，依使用者在頁面上填的品牌變數，產生一個月（4 週、至少 12 篇）的 Instagram 貼文規劃。**單檔前端，無後端、無序號授權**。預設示範品牌為虛構的「晨光手沖咖啡」。
 
 兩種產生方式（同一顆「產生我的四週計畫」按鈕，依是否填 AI 金鑰自動切換）：
 
@@ -29,8 +29,33 @@ IG 內容規劃報告產生器。以「品牌顧問」角色，依使用者在�
 - `coffeeIgPlannerBrand` — 目前的品牌變數表單值。
 - `coffeeIgPlannerContent` — 目前渲染中的內容（規則式或 AI 生成的結果都會存，reload 後還原，不會回到預設範例）。
 - `coffeeIgPlannerApiConfig` — `{provider, model, apiKey}`，金鑰只存本機瀏覽器，不經任何後端。
+- `coffeeIgPlannerMarquee` — 跑馬燈公告快取（見下方「頂部跑馬燈」）。
 
-「重設為範例」按鈕會清掉這三個 key 並還原成 `defaultBrand`。
+「重設為範例」按鈕會清掉前三個 key 並還原成 `defaultBrand`。
+
+## 5 組快速範例
+
+`data.js` 的 `window.PLANNER_TEMPLATE.presets`（5 組）驅動表單上方的 `.example-btn` 藥丸按鈕（`initExamples()`）。**刻意全部維持在咖啡／飲品店這個大類**（不同經營型態與客群變化），因為規則式套版只替換 `{{BRAND}}` token、不改寫文案情境——如果範例跨到完全不同產業（例如瑜伽教室），沒填 AI 金鑰時套出來的貼文會文不對題。真正想做跨產業的內容，本來就該搭配 AI 生成（表單本身沒有產業限制）。每組 preset 除了 8 個品牌欄位，還有一個 `extra` 欄位（只在 AI 生成時使用，寫入 `#f-extra`）。
+
+## 頂部跑馬燈
+
+比照 `SocialPost/index.html` 已驗證的共用實作：`MARQUEE_CHECK_URL` 是工作區多個工具共用的同一顆 Google Apps Script 端點，頁面載入時 POST 空 `serial`（本工具無序號機制，`doPost` 不論序號有效與否都會附上 `marquee` 陣列），只取回傳的 `marquee` 陣列（字串陣列）。先讀 `localStorage` 快取立即顯示，背景每 20 分鐘重抓一次；抓取失敗靜默忽略。獨立 `<script>` IIFE，跟主程式邏輯互不相依。**本頁沒有 `.topbar`／sticky header**，所以只需要 `body.has-marquee{padding-top:30px}`，不用像有 sticky topbar 的姊妹工具那樣額外調整 `.topbar{top:30px}`。改跑馬燈內容直接編輯共用 Google Sheet，不需要重新部署 Apps Script。
+
+## 操作手冊（manual.html）
+
+自成一頁、內嵌 `<style>`（沿用本頁的淺色暖色調變數，非 `Prompt/manual.html` 的深色主題）。內容涵蓋操作步驟／5 組快速範例說明／加入主畫面說明／隱私說明／使用警語／創作者資料／授權限制。**創作者資料區塊逐字比照** `Prompt/manual.html`／`SocialPost/manual.html`／`sbir-generator/manual.html`／`icap-generator/manual.html`／`phoenix-loan-generator/manual.html`，更新其中一邊時同步其餘各邊。`index.html` footer 的 `.footer-meta` 右側有連結 `manual.html`。
+
+## 加入主畫面（PWA）
+
+`manifest.json`＋`service-worker.js`（network-first＋同源快取備援，`fetch(request,{cache:'reload'})` 這個細節必須保留，否則 GitHub Pages 的 HTTP 快取會讓 network-first 失效）＋`icons/`（PIL＋`C:\Windows\Fonts\msjhbd.ttc` 產生，暖棕色底＋米白色單字「顧」，192／512／maskable-512／apple-touch-icon 四種尺寸；產生腳本未進 repo，比照 `SocialPost` 慣例）。安裝按鈕 `#installBtn`（footer）＋獨立 `#toast` 元素＋逐字沿用 `SocialPost` 已修好 bug 的安裝腳本（自帶 `notify()`，不依賴外部 `showToast()`，避免重蹈其他姊妹工具「按鈕沒反應」的舊坑）。**已用瀏覽器實測確認**：manifest／service worker 皆正確註冊為 active，Chrome 判定頁面符合安裝條件並觸發真實 `beforeinstallprompt`（測試時用合成 click 觸發 `.prompt()` 因缺少真實使用者手勢而報 `NotAllowedError`，這是測試方法本身的限制，不是功能缺陷——真人點擊時會正常運作）。
+
+## 響應式（RWD）
+
+版面本來就用 `repeat(auto-fit,minmax(...))` 的 grid（`.form-grid`／`.api-grid`／`.week-grid`）＋`flex-wrap:wrap`（`.brand-meta`／`.example-row`／`.form-actions`／`.footer-meta`）＋貼文表格獨立 `overflow-x:auto` 容器，天生對窄螢幕友善。**已用 iframe 模擬視窗寬度的方式實測驗證**（`resize_window` 在本機環境對此分頁無效，改用建立指定寬度的 `<iframe src="...">` 量測 `contentDocument.documentElement.scrollWidth` 判斷是否溢出）：320px／375px／768px 下 `index.html` 與 `manual.html` 皆無水平溢出，表格在自己的容器內橫向捲動、不撐開頁面，grid 於 320px 收成單欄、768px 展開多欄。
+
+## 部署
+
+已推公開 GitHub repo：<https://github.com/M255525/coffee-ig-planner>，已用 `.github/workflows/deploy-pages.yml`（Actions 部署模式，比照 `workspace-git-repos` 記載的「不要用 legacy branch-source」慣例）啟用 GitHub Pages：<https://m255525.github.io/coffee-ig-planner/>。
 
 ## 指令
 

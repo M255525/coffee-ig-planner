@@ -14,6 +14,85 @@ window.PLANNER_TEMPLATE = {
     budgetNote: "預算有限，內容以手機拍攝、免費工具排程為主"
   },
 
+  /* 5 組快速套用範例，皆為虛構咖啡／飲品店，方便免 AI 金鑰時規則式套版也能文意通順 */
+  presets: [
+    {
+      key: "morning",
+      label: "☕ 晨光手沖咖啡",
+      brand: {
+        name: "晨光手沖咖啡",
+        tagline: "一次一杯，慢慢煮給你喝",
+        location: "台北市民生東路巷弄內",
+        stage: "剛開幕",
+        team: "老闆一人經營，無專職小編",
+        audience: "25-35 歲上班族",
+        audienceNote: "重視效率，但也想要一點上班前的儀式感",
+        budgetNote: "預算有限，內容以手機拍攝、免費工具排程為主"
+      },
+      extra: ""
+    },
+    {
+      key: "lighthouse",
+      label: "🔥 燈塔烘豆所",
+      brand: {
+        name: "燈塔烘豆所",
+        tagline: "自己烘的豆子，自己負責",
+        location: "新北市三重區重新路社區內",
+        stage: "開業半年，剛開始經營社群",
+        team: "夫妻兩人經營，老闆娘兼小編",
+        audience: "30-50 歲社區居民與遛狗客",
+        audienceNote: "重視在地情感與熟客關係，不追流行",
+        budgetNote: "預算有限，優先用手機拍烘豆過程，不做付費廣告"
+      },
+      extra: "主打自家烘豆，店內有烘豆機，客人可以現場看到烘豆過程；也接熟客的豆子代烘。"
+    },
+    {
+      key: "halfmoment",
+      label: "🚇 半刻咖啡吧",
+      brand: {
+        name: "半刻咖啡吧",
+        tagline: "上車前，先喝一口",
+        location: "台中市捷運站出口旁",
+        stage: "剛開幕",
+        team: "兩位工讀生輪班，老闆偶爾支援，無專職小編",
+        audience: "25-40 歲通勤上班族",
+        audienceNote: "只有等車前後幾分鐘，重視快速取餐與不出錯",
+        budgetNote: "預算有限，內容以尖峰時段手機隨手拍為主"
+      },
+      extra: "主打外帶快取，有預先線上點餐服務，強調不用等、不出錯。"
+    },
+    {
+      key: "catnest",
+      label: "🐱 貓窩咖啡",
+      brand: {
+        name: "貓窩咖啡",
+        tagline: "貓在旁邊，咖啡更好喝",
+        location: "高雄市鹽埕區老屋改建",
+        stage: "開業一年，想加強社群經營",
+        team: "老闆與兩位兼職店員，無專職小編",
+        audience: "假日親子與貓奴族群",
+        audienceNote: "喜歡拍照打卡，重視動物友善與空間氛圍",
+        budgetNote: "預算有限，內容以店內貓咪與環境隨手拍為主"
+      },
+      extra: "店內養了 3 隻店貓，提供可以撫摸貓咪的休息區，需要提醒訪客的貓咪相處禮儀。"
+    },
+    {
+      key: "dessertlab",
+      label: "🍰 甜點實驗室咖啡",
+      brand: {
+        name: "甜點實驗室咖啡",
+        tagline: "咖啡配甜點，才是完整的下午",
+        location: "台北市大安區巷弄二樓",
+        stage: "剛開幕",
+        team: "老闆兼甜點師，一位外場，無專職小編",
+        audience: "25-40 歲女性，下午茶客群",
+        audienceNote: "重視拍照好看與甜點新鮮度，願意等候現做",
+        budgetNote: "預算有限，內容以甜點特寫與手機拍攝為主"
+      },
+      extra: "每週推出限定手作甜點，主打咖啡與甜點的搭配建議，強調現做不是預先做好冰著。"
+    }
+  ],
+
   weeklyThemes: [
     {
       week: 1,

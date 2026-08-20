@@ -1,0 +1,16 @@
+{
+  "name": "社群內容規劃報告產生器",
+  "short_name": "社群企劃",
+  "description": "以品牌顧問角色，依你的品牌變數規劃一個月的 Instagram 貼文內容，可選填 AI 金鑰生成專屬計畫",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbf5ec",
+  "theme_color": "#6f4a2f",
+  "lang": "zh-TW",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

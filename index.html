@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IG 內容規劃報告｜品牌顧問</title>
+<title>社群內容規劃報告｜品牌顧問</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6f4a2f">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="社群企劃">
 <style>
   :root{
     --bg:#fbf5ec;
@@ -67,6 +74,13 @@
   }
   .wrap{max-width:980px;margin:0 auto;padding:32px 20px 60px;}
 
+  /* ---- 跑馬燈 ---- */
+  #marqueeBar{position:fixed;top:0;left:0;right:0;height:30px;background:var(--panel);border-bottom:1px solid var(--line-soft);z-index:2100;overflow:hidden;display:none;align-items:center;}
+  #marqueeBar.show{display:flex;}
+  #marqueeTrack{display:inline-block;white-space:nowrap;padding-left:100%;font-size:13px;font-weight:600;color:var(--amber);animation:marquee-scroll 30s linear infinite;}
+  body.has-marquee{padding-top:30px;}
+  @keyframes marquee-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
   header.hero{
     background:linear-gradient(135deg,var(--brown),var(--amber));
     border-radius:var(--radius);
@@ -116,6 +130,21 @@
     display:inline-flex;align-items:center;justify-content:center;
     font-size:13px;
   }
+
+  /* ---- 快速範例 ---- */
+  .example-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .example-btn{
+    font-family:inherit;
+    font-size:12.5px;
+    background:var(--bg-alt);
+    color:var(--text-dim);
+    border:1px solid var(--line);
+    padding:7px 13px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .example-btn:hover{border-color:var(--amber);color:var(--amber);}
 
   /* ---- 表單區 ---- */
   .form-card{
@@ -307,13 +336,50 @@
   }
 
   footer{
-    text-align:center;
     font-size:12.5px;
     color:var(--text-faint);
     padding-top:20px;
     border-top:1px solid var(--line-soft);
   }
   footer a{color:var(--text-faint);}
+  .footer-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .footer-links{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .footer-link-btn{
+    font-family:inherit;
+    background:none;
+    border:1px solid var(--line-soft);
+    color:var(--text-dim);
+    font-size:12.5px;
+    padding:4px 10px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .footer-link-btn:hover{border-color:var(--amber);color:var(--text);}
+
+  #toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--brown);
+    color:#fff9f0;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s;
+    z-index:3000;
+    max-width:90vw;
+    text-align:center;
+  }
+  #toast.show{opacity:1;}
 
   @media (max-width:560px){
     .wrap{padding:20px 14px 40px;}
@@ -322,10 +388,11 @@
 </style>
 </head>
 <body>
+<div id="marqueeBar"><div id="marqueeTrack"></div></div>
 <div class="wrap">
 
   <header class="hero">
-    <div class="eyebrow">IG 一個月內容規劃・品牌顧問報告</div>
+    <div class="eyebrow">社群一個月內容規劃・品牌顧問報告</div>
     <h1 id="brand-name"></h1>
     <div class="tagline" id="brand-tagline"></div>
     <div class="brand-meta" id="brand-meta"></div>
@@ -334,6 +401,7 @@
   <section>
     <h2><span class="num">0</span>設定你的品牌變數</h2>
     <div class="form-card">
+      <div class="example-row" id="exampleRow"></div>
       <div class="form-grid">
         <label>品牌名稱<input type="text" id="f-name"></label>
         <label>一句話標語<input type="text" id="f-tagline"></label>
@@ -398,12 +466,20 @@
   </section>
 
   <footer>
-    製作：Mark Tsai｜<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a>｜品牌變數與 AI 生成內容只存在你的瀏覽器
+    <div class="footer-meta">
+      <span>製作：Mark Tsai｜<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a>｜品牌變數與 AI 生成內容只存在你的瀏覽器</span>
+      <span class="footer-links">
+        <a href="manual.html">操作手冊 →</a>
+        <button type="button" id="installBtn" class="footer-link-btn">📲 加入主畫面</button>
+      </span>
+    </div>
   </footer>
 
 </div>
 
-<script src="data.js?v=20260820b"></script>
+<div id="toast"></div>
+
+<script src="data.js?v=20260820c"></script>
 <script>
 (function(){
   "use strict";
@@ -456,6 +532,28 @@
       localStorage.setItem(BRAND_KEY, JSON.stringify(state.brand));
       localStorage.setItem(CONTENT_KEY, JSON.stringify(state.content));
     }catch(e){}
+  }
+
+  /* ---------- 快速範例 ---------- */
+  function isFormAtDefault(){
+    return FIELD_KEYS.every(function(k){ return $("f-" + k).value.trim() === TEMPLATE.defaultBrand[k]; });
+  }
+  function initExamples(){
+    var row = $("exampleRow");
+    var presets = TEMPLATE.presets || [];
+    row.innerHTML = presets.map(function(p){
+      return '<button type="button" class="example-btn" data-key="' + p.key + '">' + p.label + '</button>';
+    }).join("");
+    row.addEventListener("click", function(e){
+      var btn = e.target.closest(".example-btn");
+      if(!btn) return;
+      var preset = presets.find(function(p){ return p.key === btn.getAttribute("data-key"); });
+      if(!preset) return;
+      if(!isFormAtDefault() && !confirm("套用範例會覆蓋目前已填寫的品牌變數，確定要繼續嗎？")) return;
+      fillFormFromBrand(preset.brand);
+      $("f-extra").value = preset.extra || "";
+      showStatus("info", "已套用範例「" + preset.label + "」，確認內容後按「產生我的四週計畫」。");
+    });
   }
 
   /* ---------- 渲染 ---------- */
@@ -763,6 +861,7 @@
 
     fillFormFromBrand(state.brand);
     initAiPanel();
+    initExamples();
     renderAll(state.brand, state.content);
 
     $("generateBtn").addEventListener("click", onGenerateClick);
@@ -770,6 +869,96 @@
   }
 
   init();
+})();
+</script>
+
+<script>
+/* ================= 頂部跑馬燈（獨立運作，跟上方主程式邏輯無關；共用工作區既有的公告 Google Sheet） ================= */
+(function () {
+  "use strict";
+  var MARQUEE_CHECK_URL = "https://script.google.com/macros/s/AKfycbwKX0DNNbY8y4nf90BFTHtxgfqJcHHcZasRrgycl4QAe52_hkjMWSkYk4xOsqU-JPCROw/exec";
+  var STORAGE_KEY = "coffeeIgPlannerMarquee";
+  var REFRESH_MS = 20 * 60 * 1000;
+
+  var bar = document.getElementById("marqueeBar");
+  var track = document.getElementById("marqueeTrack");
+
+  function loadCache() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function saveCache(items) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+  }
+  function render(items) {
+    if (!items || !items.length) return;
+    var joined = items.join("　★　");
+    track.textContent = joined + "　★　" + joined;
+    bar.classList.add("show");
+    document.body.classList.add("has-marquee");
+    var width = track.scrollWidth / 2;
+    track.style.animationDuration = Math.max(width / 80, 10) + "s";
+  }
+  function fetchMarquee() {
+    fetch(MARQUEE_CHECK_URL, { method: "POST", body: JSON.stringify({ serial: "" }) })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && Array.isArray(data.marquee) && data.marquee.length) {
+          saveCache(data.marquee);
+          render(data.marquee);
+        }
+      })
+      .catch(function () {});
+  }
+
+  render(loadCache());
+  fetchMarquee();
+  setInterval(fetchMarquee, REFRESH_MS);
+})();
+</script>
+
+<script>
+/* ================= PWA 加入主畫面（獨立運作，跟上方主程式邏輯無關） ================= */
+(function () {
+  "use strict";
+  var deferredPrompt = null;
+  var btn = document.getElementById("installBtn");
+  var ua = navigator.userAgent || "";
+  var isIOSDevice = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isMacDesktop = /Macintosh/.test(ua) && !isIOSDevice;
+  var isSafariEngine = /^((?!chrome|crios|fxios|edgios|android).)*safari/i.test(ua);
+  var isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+
+  function fallbackMessage() {
+    if (isIOSDevice) return "請點畫面上的「分享」圖示，選「加入主畫面」";
+    if (isMacDesktop && isSafariEngine) return "請用選單列「檔案」→「加入 Dock」（Safari 17 以上）";
+    return "目前瀏覽器不支援安裝，或已安裝過";
+  }
+
+  function notify(msg) {
+    var t = document.getElementById("toast");
+    if (!t) { window.alert(msg); return; }
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(notify._timer);
+    notify._timer = setTimeout(function () { t.classList.remove("show"); }, 2400);
+  }
+
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredPrompt = e; });
+  window.addEventListener("appinstalled", function () { deferredPrompt = null; });
+
+  if (btn) {
+    if (isStandalone) { btn.style.display = "none"; }
+    else {
+      btn.addEventListener("click", function () {
+        if (!deferredPrompt) { notify(fallbackMessage()); return; }
+        try { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; }); }
+        catch (e) { notify(fallbackMessage()); }
+      });
+    }
+  }
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("service-worker.js").catch(function () {}); });
+  }
 })();
 </script>
 </body>
